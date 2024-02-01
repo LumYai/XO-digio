@@ -15,7 +15,7 @@
     <div class="container">
 
 
-        <!-- Modal -->
+        <!-- Modal  แสดงหน้าต่าง ชนะ เสมอ -->
         <div class="modal fade" id="winmodel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -34,11 +34,52 @@
                 </div>
             </div>
         </div>
+        <!-- Modal แสดงหน้าต่าง เปลี่ยนขนาดของกระดาน XO-->
+        <div class="modal fade" id="change_model" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">เปลี่ยนขนาดของกระดาน XO</h5>
+                        
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    </div>
+                    <div class="modal-body">
+                        <h4 id="">สามารถเปลี่ยนได้ตั้งแต่กระดานขนาด 3*3 - n*n</h4>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">ขนาด (ใส่หมายเลขมากกว่าหรือเท่ากับ 3)</span>
+                                
+                            </div>
+                            <input type="text" id=number_size class="form-control" placeholder="เช่น 3, 4, 10, 20, 50" aria-label="Username" aria-describedby="basic-addon1">
+                            
+                        </div>
+                        <div class="alert alert-danger " role="alert"  id="alert_value" style="display: none;">
+                            กรุณาใส่หมายเลขจำนวนเต็มบวกให้ถูกต้อง เช่น 3, 4, 11, 20, ...
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="button" class="btn btn-primary " onclick="click_changeSize_ox()" >ตกลง</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <h1>XO Game</h1>
+        <h1 id="showcurrplayer">Turn: </h1>
         <button onclick="restart()">Restart</button>
+        <button onclick="change_size()">change size</button>
+        
+        
+            
+        
+        
 
-        <div class="col">
+        <div id="Table_ox">
+
+        </div>
+
+        <!-- <div class="col">
             <div class="row">
                 <div class="border border-primary box" style="width:50px; height:50px" id="1">1</div>
                 <div class="border border-primary box" style="width:50px; height:50px" id="2">2</div>
@@ -57,7 +98,7 @@
                 <div class="border border-primary box" style="width:50px; height:50px" id="9">9</div>
                 
             </div>
-        </div>
+        </div> -->
     </div>
     
     
@@ -68,13 +109,16 @@
 
 
 <script>
-    let boxes = Array.from(document.getElementsByClassName('box'))
+    let boxes 
     console.log(boxes, 'h')
-    
+    let showcplayer = document.getElementById("showcurrplayer");
     let list_player_x = []
     let list_player_o = []
     let player_x_winning = false
     let player_o_winning = false
+
+    let line_winning = []
+    let sizeOfox = 3
     
 
     const o_text = "O"
@@ -87,13 +131,38 @@
     let spaces = Array(9).fill(null)
 
     let startGame = () => {
-        boxes.forEach(box => box.addEventListener('click', boxClicked))
+        showcplayer.innerText = `Turn: ${curr_Player}`;
+        changeSizeox()
+        createTableox()
+        
+        // เพิ่มปุ่มให้สามารถกดช่องได้
+        
+    }
+
+    // เมื่อกดปุ่มเปลี่ยนขนาด ox ใช้ฟังก์ชันเปลี่ยนขนาด
+    let value_sizeOfox 
+    function click_changeSize_ox() {
+        value_sizeOfox = parseFloat(document.getElementById("number_size").value);
+        // เช็คค่า value ว่าถูกต้องหรือไม่ 
+        console.log('value_sizeOfox', value_sizeOfox, typeof(value_sizeOfox))
+        if(checkInput_changeSize(value_sizeOfox)){
+            sizeOfox = value_sizeOfox
+            line_winning = []
+            console.log('sizeOfox', sizeOfox)
+            changeSizeox()
+            removeTableox()
+            createTableox()
+            $('#change_model').modal('hide');
+        }
     }
 
     function boxClicked(e){
         const id = parseInt(e.target.id)
         let nameWinner = document.getElementById('name_winner');
+        
         if(!spaces[id]){
+            
+            
             spaces[id] = curr_Player
             e.target.innerText = curr_Player
 
@@ -103,9 +172,11 @@
             if(curr_Player == x_text){
                 list_player_x.push(id)
                 curr_Player = o_text
+                showcplayer.innerText = `Turn: ${curr_Player}`;
             }else{
                 list_player_o.push(id)
                 curr_Player = x_text
+                showcplayer.innerText = `Turn: ${curr_Player}`;
             }
 
             // เช็คคนชนะ หากคนชนะ เป็น x จะ return ค่า x หากเป็น y return ค่า y
@@ -123,19 +194,13 @@
         }
         
         // เช็คหากช่องทั้งหมดเต็ม แล้วไม่มีผู้ชนะ ให้แสดงเสมอ
-        if(list_player_x.length + list_player_o.length == 9){
+        if(list_player_x.length + list_player_o.length == sizeOfox**2 && !player_x_winning && !player_o_winning ){
             showPopup()
             nameWinner.innerText = `เสมอ!!!`;
         }
         
     }
-    const line_winning = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9]
-
-        
-    ]
+    
 
     // ตรวจสอบว่ามี sublist ใน list line_winning ที่มีค่าทุกตัวอยู่ใน player_x_winning/player_o_winning หรือไม่
     // หากมีบาง list ใน line_winning มีค่าอยู่ใน list player ให้ return true
@@ -156,7 +221,54 @@
 
     }
 
+    function changeSizeox(){
+        // list_winning_line คือ list แต่ละรายการที่ทำให้ชนะ เช่น 3*3  list_winning_line คือ [1, 2, 3], [1, 4, 7] เป็นต้น
+        list_winning_line = []
+        // loop จำนวน n*n คั้ง โดยที่ หาก loop เป็นจำนวน sizeOfox หรือ j จะทำการ push ใส่ใน list_winning_line จะได้ row ของ 
+        // แต่ละ list เช้น 3*3 เมื่อครบ 1, 2, 3 จะให้ list เข้า list_winning_line จะได้ [1, 2, 3]
+        // จะได้แนวนอน sizeOfox แถว
+        // เช่น sizeOfox = 3 ได้ [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        for (let i = 0; i < sizeOfox; i++) {
+            for (let j = 0; j < sizeOfox; j++) {
+                list_winning_line.push((j+1) + (sizeOfox * i))
+            }
+            line_winning.push(list_winning_line)
+            list_winning_line = []
+        }
+        // จะได้แนวตั้ง sizeOfox แถว
+        for (let i = 0; i < sizeOfox; i++) {
+            for (let j = 0; j < sizeOfox; j++) {
+                list_winning_line.push((i+1) + (sizeOfox * j))
+            }
+            line_winning.push(list_winning_line)
+            list_winning_line = []
+        }
+        // แนวทแยง มี 2 ค่า เอาค่าจาก list แนวนอน sizeOfox แถว ตำแหน่งที่เท่ากัน เช่น ตำแหน่ง 0 0 , 1 1 ,  2 2 ...
+        for (let i = 0; i < sizeOfox; i++) {
+            for (let j = 0; j < sizeOfox; j++) {
+                if (j == i){
+                    list_winning_line.push(line_winning[i][j])
+                    break
+                }
+            }
+        }
+        line_winning.push(list_winning_line)
+        list_winning_line = []
+        // แนวทแยง ขวาบน ลง ซ้ายล่าง 0 sizeOfox-1, 0 sizeOfox - 2 ...
+        for (let i = 0; i < sizeOfox; i++) {
+            for (let j = 0; j < sizeOfox; j++) {
+                if (j == (sizeOfox-1-i)){
+                    list_winning_line.push(line_winning[i][j])
+                    break
+                }
+            }
+        }
+        line_winning.push(list_winning_line)
+        list_winning_line = []
 
+        console.log('line_winning', line_winning)
+        
+    }
 
 
 
@@ -174,6 +286,11 @@
         list_player_o = []
         player_x_winning = false
         player_o_winning = false
+        showcplayer.innerText = `Turn: ${curr_Player}`;
+    }
+    
+    function change_size(){
+        $('#change_model').modal('show');
     }
     // const button_restart = document.getElementsByClassName("restart");
     // button_restart.addEventListener('click', restart)
@@ -181,11 +298,81 @@
 
     startGame()
     
+    // แสดง pop up เมื่อจบเกม มีการชนะ แพ้ หรือเสมอ ขึ้นบนหน้าจอ
     function showPopup() {
         $('#winmodel').modal('show');
         
     }
+    // checkInput change size ox ตรวจสอบว่า input ถูกต้องหรือไม่ หากไม่ถูกแสดง alert เตือน 
+    // และ return false ไม่ให้สามารถใช้ค่าได้
+    function checkInput_changeSize(value) {
+        // หากมีค่า น้อยกว่า 3 หรือ ไม่เป็น จำนวนเต็ม ให้แสดง alert เตือน
+        if(value < 3 || !Number.isInteger(value)){
+            // แสดง Alert
+            $('#alert_value').show();
 
+            // ซ่อน Alert อัตโนมัติหลังจาก 5 วินาที
+            setTimeout(function() {
+                $('#alert_value').hide();
+            }, 7000);  // 5 วินาที
+            
+            return false
+        }
+        
+        return true
+        
+        
+        
+    }
+    
+    // function การสร้างตาราง ตามขนาด sizeOfox
+    function createTableox() {
+    // สร้าง div หลัก
+        var mainDiv = document.createElement("div");
+        mainDiv.classList.add("col");
+
+        // สร้าง rows
+        for (var i = 1; i <= sizeOfox; i++) {
+        var rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+
+        // สร้าง boxes
+        for (var j = 1; j <= sizeOfox; j++) {
+            var boxDiv = document.createElement("div");
+            boxDiv.classList.add("border", "border-primary", "box");
+            boxDiv.style.width = "50px";
+            boxDiv.style.height = "50px";
+            boxDiv.id = (i - 1) * sizeOfox + j; // กำหนด id ตามลำดับ
+
+
+
+            // เพิ่ม box ลงใน row
+            rowDiv.appendChild(boxDiv);
+        }
+
+        // เพิ่ม row ลงใน div หลัก
+        mainDiv.appendChild(rowDiv);
+        }
+
+        
+        // เข้าถึง Element ที่มี id เป็น "Table_ox" และเพิ่ม div หลักลงไป
+        document.getElementById("Table_ox").appendChild(mainDiv);
+        boxes = Array.from(document.getElementsByClassName('box'))
+        boxes.forEach(box => box.addEventListener('click', boxClicked))
+    }
+
+    // ลบตาราง เพื่อ สร้างตาสราง ox ใหม่
+    function removeTableox() {
+    // เข้าถึง Element ที่มี id เป็น "Table_ox"
+    let tableOx = document.getElementById("Table_ox");
+
+        // เช็คว่ามี child nodes อยู่หรือไม่
+        if (tableOx.hasChildNodes()) {
+        // ลบ child nodes ทั้งหมด
+            tableOx.innerHTML = '';
+        }
+    }
+    
 
 
 </script>
