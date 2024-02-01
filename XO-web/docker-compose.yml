@@ -1,0 +1,27 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app.py:/app/app.py  # Mount the app code for hot-reloading
+      - ./templates:/app/templates       # Mount the html folder
+    links:
+      - mongo
+      
+    
+  mongo:
+    image: mongo:latest  # Use the official MongoDB image
+    hostname: test_mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=test_db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      
+    ports:
+      - 27017:27017
+    volumes:
+      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
