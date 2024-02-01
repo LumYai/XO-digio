@@ -3,9 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <title>--XO--</title>
+
 </head>
 <body>
-    <h1>HEllo</h1>
+    <div class="container">
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="winmodel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">สิ้นสุดการแข่งขัน</h5>
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    </div>
+                    <div class="modal-body">
+                        <h1 id="name_winner"></h1>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+                        <button type="button" class="btn btn-primary " data-bs-dismiss="modal" onclick="restart()" >เริ่มใหม่</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h1>XO Game</h1>
+        <button onclick="restart()">Restart</button>
+
+        <div class="col">
+            <div class="row">
+                <div class="border border-primary box" style="width:50px; height:50px" id="1">1</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="2">2</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="3">3</div>
+                
+            </div>
+            <div class="row">
+                <div class="border border-primary box" style="width:50px; height:50px" id="4">4</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="5">5</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="6">6</div>
+                
+            </div>
+            <div class="row">
+                <div class="border border-primary box" style="width:50px; height:50px" id="7">7</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="8">8</div>
+                <div class="border border-primary box" style="width:50px; height:50px" id="9">9</div>
+                
+            </div>
+        </div>
+    </div>
+    
+    
 </body>
 </html>
+
+
+
+
+<script>
+    let boxes = Array.from(document.getElementsByClassName('box'))
+    console.log(boxes, 'h')
+    
+    let list_player_x = []
+    let list_player_o = []
+    let player_x_winning = false
+    let player_o_winning = false
+    
+
+    const o_text = "O"
+    const x_text = "X"
+    
+    let curr_Player = x_text 
+
+
+
+    let spaces = Array(9).fill(null)
+
+    let startGame = () => {
+        boxes.forEach(box => box.addEventListener('click', boxClicked))
+    }
+
+    function boxClicked(e){
+        const id = parseInt(e.target.id)
+        let nameWinner = document.getElementById('name_winner');
+        if(!spaces[id]){
+            spaces[id] = curr_Player
+            e.target.innerText = curr_Player
+
+
+
+            // หากคนเล่นปัจจุบันเป็น X หลังกดให้เปลี่ยนเป็น O กลับกันหากเป็น O เปลี่ยนเป็น X
+            if(curr_Player == x_text){
+                list_player_x.push(id)
+                curr_Player = o_text
+            }else{
+                list_player_o.push(id)
+                curr_Player = x_text
+            }
+
+            // เช็คคนชนะ หากคนชนะ เป็น x จะ return ค่า x หากเป็น y return ค่า y
+            
+            let check_win = check_win_player()
+            if(player_x_winning){
+                showPopup()
+                nameWinner.innerText = `ผู้เล่น X  เป็นผู้ชนะ!!!`;
+                // console.log(`X has won!`)
+            }else if(player_o_winning){
+                showPopup()
+                // console.log(`O has won!`)
+                nameWinner.innerText = `ผู้เล่น O  เป็นผู้ชนะ!!!`;
+            }
+        }
+        
+        // เช็คหากช่องทั้งหมดเต็ม แล้วไม่มีผู้ชนะ ให้แสดงเสมอ
+        if(list_player_x.length + list_player_o.length == 9){
+            showPopup()
+            nameWinner.innerText = `เสมอ!!!`;
+        }
+        
+    }
+    const line_winning = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+
+        
+    ]
+
+    // ตรวจสอบว่ามี sublist ใน list line_winning ที่มีค่าทุกตัวอยู่ใน player_x_winning/player_o_winning หรือไม่
+    // หากมีบาง list ใน line_winning มีค่าอยู่ใน list player ให้ return true
+    // ex some list_winning => [1, 2, 3]
+    // check 1, 2 ,3 ทุกค่ามีค่าใน list player [1, 5, 3, 2] return true
+    function  check_win_player(){
+        player_x_winning = line_winning.some(function(sublist) {
+            return sublist.every(function(item) {
+                return list_player_x.includes(item);
+            });
+        });
+
+        player_o_winning = line_winning.some(function(sublist) {
+            return sublist.every(function(item) {
+                return list_player_o.includes(item);
+            });
+        });
+
+    }
+
+
+
+
+
+
+    function restart(){
+        spaces.fill(null)
+        
+
+        boxes.forEach(box => {
+            box.innerText = ''
+        })
+
+        curr_Player = x_text
+        list_player_x = []
+        list_player_o = []
+        player_x_winning = false
+        player_o_winning = false
+    }
+    // const button_restart = document.getElementsByClassName("restart");
+    // button_restart.addEventListener('click', restart)
+
+
+    startGame()
+    
+    function showPopup() {
+        $('#winmodel').modal('show');
+        
+    }
+
+
+
+</script>
