@@ -44,7 +44,7 @@
                         <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
                     </div>
                     <div class="modal-body">
-                        <h4 id="">สามารถเปลี่ยนได้ตั้งแต่กระดานขนาด 3*3 - n*n</h4>
+                        <!-- <h4 id="">สามารถเปลี่ยนได้ตั้งแต่กระดานขนาด 3*3 - n*n</h4> -->
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">ขนาด (ใส่หมายเลขมากกว่าหรือเท่ากับ 3)</span>
@@ -64,41 +64,41 @@
                 </div>
             </div>
         </div>
+        <!-- Modal แสดงหน้าต่าง ประวัติการเล่น XO-->
+        <div class="modal fade" id="playing_history" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">ประวิตการเล่น XO</h5>
+                        
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div id="play_hisory"> 
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="removeTableHistory()">ปิด</button>
+                        <!-- <button type="button" class="btn btn-primary " onclick="click_changeSize_ox()" >ตกลง</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <h1>XO Game</h1>
         <h1 id="showcurrplayer">Turn: </h1>
-        <button onclick="restart()">Restart</button>
-        <button onclick="change_size()">change size</button>
-        
-        
-            
-        
+        <button onclick="restart()" type="button" class="btn btn-secondary">Restart</button>
+        <button onclick="change_size()" type="button" class="btn btn-primary">change size</button>
+        <button onclick="playing_history()" type="button" class="btn btn-primary">Playing history</button>  
         
 
         <div id="Table_ox">
 
         </div>
 
-        <!-- <div class="col">
-            <div class="row">
-                <div class="border border-primary box" style="width:50px; height:50px" id="1">1</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="2">2</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="3">3</div>
-                
-            </div>
-            <div class="row">
-                <div class="border border-primary box" style="width:50px; height:50px" id="4">4</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="5">5</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="6">6</div>
-                
-            </div>
-            <div class="row">
-                <div class="border border-primary box" style="width:50px; height:50px" id="7">7</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="8">8</div>
-                <div class="border border-primary box" style="width:50px; height:50px" id="9">9</div>
-                
-            </div>
-        </div> -->
     </div>
     
     
@@ -116,6 +116,7 @@
     let list_player_o = []
     let player_x_winning = false
     let player_o_winning = false
+    let id_round_play = 1
 
     let line_winning = []
     let sizeOfox = 3
@@ -159,6 +160,8 @@
     function boxClicked(e){
         const id = parseInt(e.target.id)
         let nameWinner = document.getElementById('name_winner');
+
+        
         
         if(!spaces[id]){
             
@@ -186,18 +189,21 @@
                 showPopup()
                 nameWinner.innerText = `ผู้เล่น X  เป็นผู้ชนะ!!!`;
                 // console.log(`X has won!`)
+                save_play_round()
             }else if(player_o_winning){
                 showPopup()
                 // console.log(`O has won!`)
                 nameWinner.innerText = `ผู้เล่น O  เป็นผู้ชนะ!!!`;
+                save_play_round()
+            }else if(list_player_x.length + list_player_o.length == sizeOfox**2 && !player_x_winning && !player_o_winning ){
+                // เช็คหากช่องทั้งหมดเต็ม แล้วไม่มีผู้ชนะ ให้แสดงเสมอ
+                showPopup()
+                nameWinner.innerText = `เสมอ!!!`;
+                save_play_round()
             }
         }
         
-        // เช็คหากช่องทั้งหมดเต็ม แล้วไม่มีผู้ชนะ ให้แสดงเสมอ
-        if(list_player_x.length + list_player_o.length == sizeOfox**2 && !player_x_winning && !player_o_winning ){
-            showPopup()
-            nameWinner.innerText = `เสมอ!!!`;
-        }
+        
         
     }
     
@@ -289,11 +295,21 @@
         showcplayer.innerText = `Turn: ${curr_Player}`;
     }
     
+    // แสดงหน้าต่างเปลี่ยนขนาดกระดาษ และเคลียค่าในกระดาษออก
     function change_size(){
         $('#change_model').modal('show');
+        spaces.fill(null);
     }
-    // const button_restart = document.getElementsByClassName("restart");
-    // button_restart.addEventListener('click', restart)
+
+    
+    // แสดงหน้าต่างประวัติการเล่น 
+    function playing_history(){
+        $('#playing_history').modal('show');
+        display_play_round()
+
+
+    }
+
 
 
     startGame()
@@ -327,7 +343,7 @@
     
     // function การสร้างตาราง ตามขนาด sizeOfox
     function createTableox() {
-    // สร้าง div หลัก
+        // สร้าง div หลัก
         var mainDiv = document.createElement("div");
         mainDiv.classList.add("col");
 
@@ -372,7 +388,126 @@
             tableOx.innerHTML = '';
         }
     }
+
+    // ลบตาราง ประวัติการแข่งเมื่อปิด
+    function removeTableHistory() {
+    // เข้าถึง Element ที่มี id เป็น "Table_ox"
+    let tablehis = document.getElementById("play_hisory");
+
+        // เช็คว่ามี child nodes อยู่หรือไม่
+        if (tablehis.hasChildNodes()) {
+        // ลบ child nodes ทั้งหมด
+            tablehis.innerHTML = '';
+        }
+    }
     
 
+    //----------------------------API--------------------------------------
+    // ส่งประวัติการเล่นไปหลังบ้านเพื่อจัดเก็บลง database
+    function save_play_round() {
+        // สร้างข้อมูลที่จะส่งไปยัง API
+        console.log('id_round_play', id_round_play)
+        let data_play_round = {
+            id_round: id_round_play,
+            list_x: list_player_x,
+            list_o: list_player_o,
+            size: sizeOfox
+            
+        };
 
+        fetch('/api/play_round', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data_play_round)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result.message); // แสดงข้อความสำหรับการแจ้งเตือนผู้ใช้
+                console.log('****บัทึกสมบูรณ์!@@@', list_player_x , list_player_o, id_round_play)
+            })
+            .catch(error => {
+                console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
+            });
+            
+        id_round_play += 1;
+        
+    }
+
+    // แสดงประวัติการเล่น ดึงข้อมูลมาจาก database
+    function display_play_round() {
+        fetch('/api/play_round_display')
+                .then(response => response.json())
+                .then(data => {
+                    
+
+                    console.log('have data ==> ', data)
+                    // console.log('have data ==> ', data[0]['list_o'])
+                    // let display_play_history = document.getElementById("play_hisory");
+
+
+                    // display_play_history.textContent = data['_id'], item['list_o'], item['list_x'];
+
+                    // สร้าง div ใหญ่สุด ไว้ใส่ ประวัติย่อยทุกอัน
+                    let bigDiv = document.createElement("div");
+
+                    let size_item 
+                    let list_o_item 
+                    let list_x_item 
+                    
+                    data.forEach(function(item){
+                        
+
+                        console.log(`id ${item['_id']}`, item['list_o'], item['list_x'], `size ${item['size']}`)
+                        
+                        size_item = item['size']
+                        list_o_item = item['list_o']
+                        list_x_item = item['list_x']
+
+                        // สร้าง div หลัก
+                        let mainDiv = document.createElement("div");
+                        mainDiv.classList.add("col");
+
+                        // สร้าง rows
+                        for (let i = 1; i <= size_item; i++) {
+                        let rowDiv = document.createElement("div");
+                        rowDiv.classList.add("row");
+
+                        // สร้าง boxes
+                        for (let j = 1; j <= size_item; j++) {
+                            let boxDiv = document.createElement("div");
+                            boxDiv.classList.add("border", "border-primary", "box");
+                            boxDiv.style.width = "50px";
+                            boxDiv.style.height = "50px";
+                            boxDiv.id = (i - 1) * size_item + j; // กำหนด id ตามลำดับ
+
+
+
+                            // เพิ่ม box ลงใน row
+                            rowDiv.appendChild(boxDiv);
+                        }
+                        // เพิ่มการเดินในแต่ละตาของ player
+                        // let count = 0
+                        // for (let k = 1; k <= list_o_item + list_x_item; k++) {
+
+                        // }
+
+                        // เพิ่ม row ลงใน div หลัก
+                        mainDiv.appendChild(rowDiv);
+                    }
+
+                        
+                        // เข้าถึง Element ที่มี id เป็น "Table_ox" และเพิ่ม div หลักลงไป
+                        bigDiv.appendChild(mainDiv);
+                        // document.getElementById("Table_ox").appendChild(mainDiv);
+
+                        console.log('----------------')
+                        // display_play_history.textContent = item['_id'], item['list_o'], item['list_x'];
+                    })
+                    document.getElementById("play_hisory").appendChild(bigDiv);
+                });
+    }
+    
+    
 </script>
