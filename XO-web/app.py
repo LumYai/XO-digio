@@ -27,7 +27,7 @@ def index():
 # สร้าง Sequence Collection ถ้ายังไม่มี
 if 'sequence' not in db.list_collection_names():
     db.create_collection('sequence')
-    db.sequence.insert_one({'_id': 'play_round', 'sequence_value': 1})
+    db.sequence.insert_one({'_id': 'play_round', 'sequence_value': 0})
 #  เก็บประวัติการเล่นบน database
 
 @app.route('/api/play_round', methods=['POST'])

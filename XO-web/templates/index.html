@@ -110,7 +110,7 @@
 
 <script>
     let boxes 
-    console.log(boxes, 'h')
+    // console.log(boxes, 'h')
     let showcplayer = document.getElementById("showcurrplayer");
     let list_player_x = []
     let list_player_o = []
@@ -145,11 +145,11 @@
     function click_changeSize_ox() {
         value_sizeOfox = parseFloat(document.getElementById("number_size").value);
         // เช็คค่า value ว่าถูกต้องหรือไม่ 
-        console.log('value_sizeOfox', value_sizeOfox, typeof(value_sizeOfox))
+        // console.log('value_sizeOfox', value_sizeOfox, typeof(value_sizeOfox))
         if(checkInput_changeSize(value_sizeOfox)){
             sizeOfox = value_sizeOfox
             line_winning = []
-            console.log('sizeOfox', sizeOfox)
+            // console.log('sizeOfox', sizeOfox)
             changeSizeox()
             removeTableox()
             createTableox()
@@ -272,7 +272,7 @@
         line_winning.push(list_winning_line)
         list_winning_line = []
 
-        console.log('line_winning', line_winning)
+        // console.log('line_winning', line_winning)
         
     }
 
@@ -443,7 +443,7 @@
                 .then(data => {
                     
 
-                    console.log('have data ==> ', data)
+                    // console.log('have data ==> ', data)
                     // console.log('have data ==> ', data[0]['list_o'])
                     // let display_play_history = document.getElementById("play_hisory");
 
@@ -461,8 +461,8 @@
                     data.forEach(function(item){
                         
 
-                        console.log(`id ${item['_id']}`, item['list_o'], item['list_x'], `size ${item['size']}`)
-                        console.log('typeeeeeeeeeeee',typeof(item['list_o'][0]))
+                        // console.log(`id ${item['_id']}`, item['list_o'], item['list_x'], `size ${item['size']}`)
+                        // console.log('typeeeeeeeeeeee',typeof(item['list_o'][0]))
                         
                         size_item = item['size']
                         list_o_item = item['list_o']
@@ -481,7 +481,7 @@
 
                         // แสดงประวัติลำดับการเล่นของ OX
                         // console.log('length.list_o_itemlength.list_o_item', length.list_o_item, list_o_item)
-                        console.log('list_o_item 001', list_o_item)
+                        // console.log('list_o_item 001', list_o_item)
                         let text_order_play = 'ลำดับการเล่น => '
                         let count_history_x = 0
                         let count_history_o = 0
@@ -521,7 +521,7 @@
                                 // console.log('Testtttt---boxDiv.id ', list_x_item)
                                 // ตรวจสอบว่า (i - 1) * size_item + j อยู่ใน list x หรือไม่
                                 if (list_x_item.includes(position)) {
-                                    console.log('Testtttt---XXXX')
+                                    // console.log('Testtttt---XXXX')
                                     // ถ้าอยู่ใน list a ให้ใส่ tag <p> ที่มีค่าเป็น "X" แทน
                                     pTag.textContent = "X";
                                 }
@@ -589,7 +589,7 @@
                         bigDiv.appendChild(mainDiv);
                         // document.getElementById("Table_ox").appendChild(mainDiv);
 
-                        console.log('----------------')
+                        // console.log('----------------')
                         // display_play_history.textContent = item['_id'], item['list_o'], item['list_x'];
                     })
                     document.getElementById("play_hisory").appendChild(bigDiv);
