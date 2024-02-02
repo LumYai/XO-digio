@@ -66,7 +66,7 @@
         </div>
         <!-- Modal แสดงหน้าต่าง ประวัติการเล่น XO-->
         <div class="modal fade" id="playing_history" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg" >
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">ประวิตการเล่น XO</h5>
@@ -116,7 +116,7 @@
     let list_player_o = []
     let player_x_winning = false
     let player_o_winning = false
-    let id_round_play = 1
+    
 
     let line_winning = []
     let sizeOfox = 3
@@ -373,6 +373,7 @@
         
         // เข้าถึง Element ที่มี id เป็น "Table_ox" และเพิ่ม div หลักลงไป
         document.getElementById("Table_ox").appendChild(mainDiv);
+        
         boxes = Array.from(document.getElementsByClassName('box'))
         boxes.forEach(box => box.addEventListener('click', boxClicked))
     }
@@ -406,9 +407,9 @@
     // ส่งประวัติการเล่นไปหลังบ้านเพื่อจัดเก็บลง database
     function save_play_round() {
         // สร้างข้อมูลที่จะส่งไปยัง API
-        console.log('id_round_play', id_round_play)
+        // console.log('id_round_play', id_round_play)
         let data_play_round = {
-            id_round: id_round_play,
+            
             list_x: list_player_x,
             list_o: list_player_o,
             size: sizeOfox
@@ -425,13 +426,13 @@
             .then(response => response.json())
             .then(result => {
                 console.log(result.message); // แสดงข้อความสำหรับการแจ้งเตือนผู้ใช้
-                console.log('****บัทึกสมบูรณ์!@@@', list_player_x , list_player_o, id_round_play)
+                console.log('****บัทึกสมบูรณ์!@@@', list_player_x , list_player_o)
             })
             .catch(error => {
                 console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
             });
             
-        id_round_play += 1;
+        
         
     }
 
@@ -455,19 +456,50 @@
                     let size_item 
                     let list_o_item 
                     let list_x_item 
+                    let id_item 
                     
                     data.forEach(function(item){
                         
 
                         console.log(`id ${item['_id']}`, item['list_o'], item['list_x'], `size ${item['size']}`)
+                        console.log('typeeeeeeeeeeee',typeof(item['list_o'][0]))
                         
                         size_item = item['size']
                         list_o_item = item['list_o']
                         list_x_item = item['list_x']
+                        id_item  = item['_id']
 
                         // สร้าง div หลัก
                         let mainDiv = document.createElement("div");
                         mainDiv.classList.add("col");
+
+
+                        // สร้าง <h1> element
+                        let headerElement = document.createElement("h1");
+                        let Order_of_play = document.createElement("p");
+                        headerElement.textContent = id_item;
+
+                        // แสดงประวัติลำดับการเล่นของ OX
+                        // console.log('length.list_o_itemlength.list_o_item', length.list_o_item, list_o_item)
+                        console.log('list_o_item 001', list_o_item)
+                        let text_order_play = 'ลำดับการเล่น => '
+                        let count_history_x = 0
+                        let count_history_o = 0
+                        for (let i = 0; i < list_o_item.length + list_x_item.length; i++){
+                            
+                            if(i % 2 == 0){
+                                text_order_play += list_x_item[count_history_x] + ', '
+                                count_history_x += 1
+                            }else{
+                                text_order_play += list_o_item[count_history_o] + ', '
+                                count_history_o += 1
+                            }
+                            
+                        }
+                        Order_of_play.textContent = text_order_play;
+                        // เพิ่ม <h1> element ลงใน mainDiv
+                        mainDiv.appendChild(headerElement);
+                        mainDiv.appendChild(Order_of_play);
 
                         // สร้าง rows
                         for (let i = 1; i <= size_item; i++) {
@@ -475,30 +507,85 @@
                         rowDiv.classList.add("row");
 
                         // สร้าง boxes
-                        for (let j = 1; j <= size_item; j++) {
-                            let boxDiv = document.createElement("div");
-                            boxDiv.classList.add("border", "border-primary", "box");
-                            boxDiv.style.width = "50px";
-                            boxDiv.style.height = "50px";
-                            boxDiv.id = (i - 1) * size_item + j; // กำหนด id ตามลำดับ
+                            for (let j = 1; j <= size_item; j++) {
+                                let boxDiv = document.createElement("div");
+                                let pTag = document.createElement("p");
+                                
+                                boxDiv.classList.add("border", "border-primary", "box");
+                                boxDiv.style.width = "50px";
+                                boxDiv.style.height = "50px";
+                                boxDiv.id = Number((i - 1) * size_item + j); // กำหนด id ตามลำดับ
+                                let position = (i - 1) * size_item + j
+
+                                // console.log('Testtttt---boxDiv.id ', boxDiv.id)
+                                // console.log('Testtttt---boxDiv.id ', list_x_item)
+                                // ตรวจสอบว่า (i - 1) * size_item + j อยู่ใน list x หรือไม่
+                                if (list_x_item.includes(position)) {
+                                    console.log('Testtttt---XXXX')
+                                    // ถ้าอยู่ใน list a ให้ใส่ tag <p> ที่มีค่าเป็น "X" แทน
+                                    pTag.textContent = "X";
+                                }
+
+                                // ตรวจสอบว่า (i - 1) * size_item + j อยู่ใน list o หรือไม่
+                                else if(list_o_item.includes(position)) {
+                                    // ถ้าอยู่ใน list a ให้ใส่ tag <p> ที่มีค่าเป็น "X" แทน
+                                    pTag.textContent = "O";
+                                }
+
+                                // // เพิ่ม tag <p> ที่มีค่าเป็น 0
+                                // let pTag = document.createElement("p");
+                                // pTag.textContent = "0";
+
+                                // // เพิ่ม <p> tag ลงใน boxDiv
+                                // boxDiv.appendChild(pTag);
+                                // เพิ่ม <p> tag ลงใน boxDiv
+                                boxDiv.appendChild(pTag);
 
 
 
-                            // เพิ่ม box ลงใน row
-                            rowDiv.appendChild(boxDiv);
-                        }
+                                // เพิ่ม box ลงใน row
+                                rowDiv.appendChild(boxDiv);
+                            }
                         // เพิ่มการเดินในแต่ละตาของ player
+                            
                         // let count = 0
                         // for (let k = 1; k <= list_o_item + list_x_item; k++) {
 
                         // }
 
+                        
+                        
                         // เพิ่ม row ลงใน div หลัก
                         mainDiv.appendChild(rowDiv);
-                    }
+                        
 
                         
+                    }      
+                    // // แสดงประวัติลำดับการเล่นของ OX
+                    // let pTag = document.createElement("p");
+                    // let text_order_play = ''
+                    // for (let i = 0; i<length.list_o_item+length.list_x_item; i++){
+                    //     if(i % 2 == 0){
+                    //         text_order_play += list_x_item[i] + ' '
+                    //     }else{
+                    //         text_order_play += list_o_item[i] + ' '
+                    //     }
+                    // }
+                    // pTag.textContent = text_order_play
+                    // Order_of_play.appendChild(pTag);
+
+                        // pTag.textContent = list_player_x;
+                        // Order_of_play.textContent = id_item;
+
+                        // pTag.textContent = list_o_item;
+                        // Order_of_play.textContent = id_item;
+                        
+                        
+
+
                         // เข้าถึง Element ที่มี id เป็น "Table_ox" และเพิ่ม div หลักลงไป
+
+                        // mainDiv.appendChild(pTag);
                         bigDiv.appendChild(mainDiv);
                         // document.getElementById("Table_ox").appendChild(mainDiv);
 

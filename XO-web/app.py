@@ -23,13 +23,25 @@ def index():
     return render_template('index.html', data=data)
 
 #  ----------API เก็บข้อมูลลง Database--------------
+
+# สร้าง Sequence Collection ถ้ายังไม่มี
+if 'sequence' not in db.list_collection_names():
+    db.create_collection('sequence')
+    db.sequence.insert_one({'_id': 'play_round', 'sequence_value': 1})
 #  เก็บประวัติการเล่นบน database
+
 @app.route('/api/play_round', methods=['POST'])
 def play_round():
     # รับข้อมูลที่ส่งมาจากแอพพลิเคชัน (รหัสวิชา)
     data = request.json
 
-    id_r = data.get('id_round')
+    id_r = db.sequence.find_one_and_update(
+        {'_id': 'play_round'},
+        {'$inc': {'sequence_value': 1}},
+        return_document=True
+    )['sequence_value']
+
+
     list_x = data.get('list_x')
     list_o = data.get('list_o')
     size = data.get('size')
