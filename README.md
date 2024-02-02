@@ -9,6 +9,9 @@
 ใช้คำสั่ง docker-compose up เพื่อสร้าง image และ เริ่มต้น containers (ต้องเปิด Docker Desktop ก่อนใช้คำสั่ง)
 ![alt text](image-3.png)
 หากต้องการหยุดการทำงานของ containers ใช้คำสั่ง docker-compose down
+หรือกดปุ่ม stop ตรง column action ได้
+![image](https://github.com/LumYai/XO-digio/assets/108004359/2955128d-56fd-4e0f-abc3-4a9d65652467)
+
 ![alt text](image-4.png)
 ตรวจสอบว่า containers ทำงานได้ทั้งหมด หากมี containers ที่หยุดการทำงานให้คลิก ปุ่ม Start ที่ column Actios เพื่อเริ่มทำงาน
 ![alt text](image-5.png)
